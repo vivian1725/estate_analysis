@@ -94,14 +94,17 @@ plt.figsize=(20,10)
 plt.ylabel('price')
 plt.xlabel('year')
 ```
+
+![Alt text](pc1.png)
+
 ##### 鼓山區的房價一直區於高處(但也挺保值沒有往下掉),新興區突然往上爬（是最近有什麼高級建案嗎)，苓雅區和前金區的價格一直上上下下
 ##### 然後最近開始前鎮區的單價開始超過左營區,三民區算是高雄區中等房價
 ##### 鹽埕區的單價好像不保值2015後一直快速往下掉,而楠梓區單價平穩但在高雄區僅高過小港和旗津區，應該要來個人口調查看看大家都住那裡
 
-![Alt text](pc1.png)
 --------
 
 # 高雄市房地產交易量
+```python
 volume = {}
 for district in set(df_city['鄉鎮市區']):
     cond = (
@@ -119,11 +122,12 @@ plt.legend( labels = volume_history.columns, loc = 'upper left',fontsize=20)
 plt.figsize=(20,10)
 plt.ylabel('volume')
 plt.xlabel('year')
+```
 
 ![Alt text](pc2.png)
 
 ##### 交易量 都由2013年開始往下掉，看起來 目前交易量多的也落在 鼓山，左營，三民(三者比較接近的成交量)
 ##### 楠梓的成交量看起來有掉比較多的現象（難道發現真的離市區太遙遠了)
 
-
+--------
 
