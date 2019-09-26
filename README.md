@@ -147,3 +147,32 @@ ax2.plot(volume_history.mean(axis=1), label='總交易數量',linewidth = 3)
 ![Alt text](pc3.png)
 
 * 交易量在2013年價格起飛時達到交易量最高峰，大家一直追逐到2015年，2016年後房價持續下跌但交易量就趨於平緩,2019僅有兩季未納入參考
+
+```python
+#建物類型交易量比較
+building_type_prices = {}
+building_type_volume = {}
+for building_type in set(df['建物型態2']):
+    cond = (
+        (df['主要用途'] == '住家用')
+        & (df['單價元坪'] < df["單價元坪"].quantile(0.8))
+        & (df['單價元坪'] > df["單價元坪"].quantile(0.2))
+        & (df['建物型態2'] == building_type)
+        )
+    building_type_prices[building_type] = df[cond]['單價元坪'].groupby(df[cond]['year']).mean().loc[2012:]
+    building_type_volume[building_type] = df[cond]['單價元坪'].groupby(df[cond]['year']).count().loc[2012:]
+plt.rcParams['font.sans-serif']=['SimHei'] 
+building_price=pd.DataFrame(building_type_prices)[['公寓', '住宅大樓', '套房', '華廈','透天厝']]
+building_volume=pd.DataFrame(building_type_volume)[['公寓', '住宅大樓', '套房', '華廈','透天厝']]
+plt.figure(figsize=(15, 15))
+plt.subplot(211)
+plt.plot(building_price)
+plt.legend( labels = building_price.columns, loc = 'upper left',fontsize=15)
+plt.subplot(212)
+plt.plot(building_volume)
+plt.legend( labels = building_volume.columns, loc = 'upper left',fontsize=15)
+```
+![Alt text](pc4.png)
+
+* 大樓與透天厝的單價還是比較高,價格還差不多貴,目前平均高雄市單價在15~16萬左右,居然華夏和公寓的價格比套房單價還低
+* 交易量來看還是大家都在買大樓多，再來就是透天厝,而公寓量少到一年交易不到300件印不出來,果然老舊公寓很難處理呀
