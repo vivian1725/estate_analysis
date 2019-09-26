@@ -131,3 +131,19 @@ plt.xlabel('year')
 
 --------
 
+# 總體高雄市房價與交易量比較
+```python
+fig = plt.figure(figsize=(15, 15))
+ax = fig.add_axes([0,0.3,1,0.4])
+ax2 = fig.add_axes([0,0.2,1,0.1])
+
+ax.set_ylabel('單價平均/坪',fontproperties=font,fontsize=20)
+ax.tick_params(axis='both',labelsize=15)
+ax.plot(price_history.mean(axis=1), label='單價平均',linewidth = 3)
+ax2.set_ylabel('交易總量',fontproperties=font,fontsize=20)
+ax2.tick_params(axis='both',labelsize=15)
+ax2.plot(volume_history.mean(axis=1), label='總交易數量',linewidth = 3)
+```
+![Alt text](pc3.png)
+
+* 交易量在2013年價格起飛時達到交易量最高峰，大家一直追逐到2015年，2016年後房價持續下跌但交易量就趨於平緩,2019僅有兩季未納入參考
