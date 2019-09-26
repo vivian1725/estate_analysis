@@ -16,3 +16,81 @@ for d in dirs:
     
 df = pd.concat(dfs, sort=True)
 ```
+
+# 清洗資料
+
+* 新增交易年份
+```python
+df['year'] = df['交易年月日'].str[:-4].astype(int) + 1911
+```
+* 單價元平方公尺資料合併，把平方公尺換算成坪數，每平方單價換成每坪單價
+```python
+df['單價元平方公尺'].fillna(df['單價元/平方公尺'], inplace=True)
+df=df.drop(columns='單價元/平方公尺')
+df['建物移轉面積坪數']=df['建物移轉總面積平方公尺'].astype(float) * 0.3025
+df['單價元平方公尺'] = df['單價元平方公尺'].astype(float)
+df['單價元坪'] = df['單價元平方公尺'].astype(float) * 3.30579
+```
+* 刪除有備註之交易（多為親友交易、價格不正常之交易）, 刪除建築型態為土地（未有建築物於地上)
+* 清掉一些奇怪年度的資料 &  單坪0元的
+```python
+df = df[df['備註'].isnull()]
+df=df[df['建物型態2'] != '其他']
+df=df[df['year'] > 2009]
+df=df[df['單價元坪']>0]
+```
+[Alt text](pc1.jpg)
+* 將index改成年月日
+```python
+df.index = pd.to_datetime((df['交易年月日'].str[:-4].astype(int) + 1911).astype(str) + df['交易年月日'].str[-4:] ,errors='coerce')
+```
+
+* 建物型態資料太多，為了之後方便使用
+```python
+df['建物型態2'] = df['建物型態'].str.split('(').str[0]
+```
+
+* 算一下建築物年齡
+```python
+df['建築完成年月']=df['建築完成年月'].astype(str)
+x=datetime.datetime.now()
+nowyear=x.year
+
+def AAA(genre):
+    if genre == 'nan':
+        return-1
+    elif len(genre) < 4:
+        return nowyear-(int(genre)+ 1911) 
+    else:
+        buildyear=int(genre[:-4])
+        return nowyear-(buildyear + 1911)
+        
+df['建築年齡'] = df.apply(lambda x: AAA(x['建築完成年月']),axis=1)
+```
+
+* 太多舊高雄縣現為高雄市行政區，暫不考慮，加入之前的高雄縣太眼花瞭亂了
+```python
+df_city= df[df['鄉鎮市區'].isin(['左營區','鼓山區','楠梓區','三民區','苓雅區','新興區','前金區','鹽埕區','前鎮區','旗津區','小港區'])]
+```
+
+# 高雄市單價年平均
+```python
+prices = {}
+for district in set(df_city['鄉鎮市區']):
+    cond = (
+        (df_city['主要用途'] == '住家用')
+        & (df_city['鄉鎮市區'] == district)
+        & (df_city['單價元坪'] < df_city["單價元坪"].quantile(0.95))
+        & (df_city['單價元坪'] > df_city["單價元坪"].quantile(0.05))
+        )
+    groups = df_city[cond]['year']
+    prices[district] = df_city[cond]['單價元坪'].astype(float).groupby(groups).mean().loc[2012:]
+price_history = pd.DataFrame(prices)
+plt.rcParams['font.sans-serif']=['SimHei'] 
+plt.rcParams['axes.unicode_minus']=False
+price_history.plot(figsize=(20,10),linewidth = 3)
+plt.legend( labels = price_history.columns, loc = 'upper left',fontsize=20)
+plt.figsize=(20,10)
+plt.ylabel('price')
+plt.xlabel('year')
+``
