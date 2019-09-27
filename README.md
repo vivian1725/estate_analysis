@@ -56,7 +56,7 @@ df['建築完成年月']=df['建築完成年月'].astype(str)
 x=datetime.datetime.now()
 nowyear=x.year
 
-def AAA(genre):
+def build_age(genre):
     if genre == 'nan':
         return-1
     elif len(genre) < 4:
@@ -65,7 +65,7 @@ def AAA(genre):
         buildyear=int(genre[:-4])
         return nowyear-(buildyear + 1911)
         
-df['建築年齡'] = df.apply(lambda x: AAA(x['建築完成年月']),axis=1)
+df['建築年齡'] = df.apply(lambda x: build_age(x['建築完成年月']),axis=1)
 ```
 
 * 太多舊高雄縣現為高雄市行政區，暫不考慮，加入之前的高雄縣太眼花瞭亂了
